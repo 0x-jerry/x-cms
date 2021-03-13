@@ -1,0 +1,3 @@
+# debug | release
+GIN_MODE: debug
+port: :9555
