@@ -1,10 +1,8 @@
 package entity
 
-import "gorm.io/gorm"
-
 type Note struct {
-	gorm.Model
+	Model
 
-	title   string
-	content string
+	Title   string `json:"title"`
+	Content string `json:"content"`
 }

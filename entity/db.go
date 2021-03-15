@@ -1,11 +1,13 @@
 package entity
 
 import (
+	"time"
+
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
+var dbInstance *gorm.DB
 
 func Initialize(dbName string) {
 	db, err := gorm.Open(sqlite.Open(dbName), &gorm.Config{})
@@ -13,9 +15,18 @@ func Initialize(dbName string) {
 		panic("failed to connect database")
 	}
 
-	db.AutoMigrate(&User{}, &Category{}, &Note{}, &Post{}, &Tag{})
+	db.AutoMigrate(&User{}, &Category{}, &Note{}, &Post{}, &Tag{}, &PostTag{}, &PostCategory{})
+	dbInstance = db
 }
 
 func Db() *gorm.DB {
-	return db
+	return dbInstance
+}
+
+// Basic model
+type Model struct {
+	ID        uint           `json:"id" gorm:"primarykey"`
+	CreatedAt time.Time      `json:"createdAt"`
+	UpdatedAt time.Time      `json:"updatedAt"`
+	DeletedAt gorm.DeletedAt `json:"deletedAt" gorm:"index"`
 }

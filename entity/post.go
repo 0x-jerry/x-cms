@@ -1,15 +1,24 @@
 package entity
 
-import "gorm.io/gorm"
-
 type Post struct {
-	gorm.Model
+	Model
 
-	title string
+	Title   string `json:"title"`
+	Content string `json:"content"`
+}
 
-	content string
+type PostTag struct {
+	PostID string `json:"postId"`
+	Post   Post   `json:"post"`
 
-	tags []Tag
+	TagID string `json:"tagId"`
+	Tag   Tag    `json:"tag"`
+}
 
-	categories []Category
+type PostCategory struct {
+	PostID string `json:"postId"`
+	Post   Post   `json:"post"`
+
+	CategoryID string   `json:"categoryId"`
+	Category   Category `json:"category"`
 }

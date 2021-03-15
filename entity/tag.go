@@ -1,10 +1,8 @@
 package entity
 
-import "gorm.io/gorm"
-
 type Tag struct {
-	gorm.Model
+	Model
 
-	name     string
-	describe string
+	Name     string `json:"name"`
+	Describe string `json:"describe"`
 }
