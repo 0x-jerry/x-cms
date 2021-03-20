@@ -7,18 +7,42 @@ type Post struct {
 	Content string `json:"content"`
 }
 
-type PostTag struct {
-	PostID string `json:"postId"`
-	Post   Post   `json:"post"`
-
-	TagID string `json:"tagId"`
-	Tag   Tag    `json:"tag"`
+func CreatePost(p *Post) error {
+	return Db().Create(&p).Error
 }
 
-type PostCategory struct {
-	PostID string `json:"postId"`
-	Post   Post   `json:"post"`
+func UpdatePost(p *Post) error {
+	return Db().Model(&p).Updates(p).Error
+}
 
-	CategoryID string   `json:"categoryId"`
-	Category   Category `json:"category"`
+func GetPost(id uint) (*Post, error) {
+	post := Post{
+		Model: Model{
+			ID: id,
+		},
+	}
+
+	err := Db().Find(&post).Error
+
+	return &post, err
+}
+
+func DeletePost(id uint) error {
+	post := Post{
+		Model: Model{
+			ID: id,
+		},
+	}
+
+	return Db().Delete(&post).Error
+}
+
+func GetPosts(page int, size int, sort string) (*[]Post, error) {
+	offset := page * size
+
+	var posts []Post
+
+	err := Db().Omit("Content").Order(sort + " desc").Offset(offset).Limit(size).Find(&posts).Error
+
+	return &posts, err
 }
