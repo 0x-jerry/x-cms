@@ -4,6 +4,8 @@ type Post struct {
 	Model
 
 	Title   string `json:"title"`
+	Summary string `json:"summary"`
+
 	Content string `json:"content"`
 }
 
@@ -15,14 +17,20 @@ func UpdatePost(p *Post) error {
 	return Db().Model(&p).Updates(p).Error
 }
 
-func GetPost(id uint) (*Post, error) {
+func GetPost(id uint, allInformation bool) (*Post, error) {
 	post := Post{
 		Model: Model{
 			ID: id,
 		},
 	}
 
-	err := Db().Find(&post).Error
+	var err error
+
+	if allInformation {
+		err = Db().Find(&post).Error
+	} else {
+		err = Db().Omit("content").Find(&post).Error
+	}
 
 	return &post, err
 }
@@ -42,7 +50,7 @@ func GetPosts(page int, size int, sort string) (*[]Post, error) {
 
 	var posts []Post
 
-	err := Db().Omit("Content").Order(sort + " desc").Offset(offset).Limit(size).Find(&posts).Error
+	err := Db().Omit("content").Order(sort + " desc").Offset(offset).Limit(size).Find(&posts).Error
 
 	return &posts, err
 }

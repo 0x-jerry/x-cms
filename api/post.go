@@ -46,6 +46,7 @@ func GetPosts(router *gin.RouterGroup) {
 
 type createPostParam struct {
 	Title   string `form:"title" binding:"required"`
+	Summary string `form:"summary"`
 	Content string `form:"content" binding:"required"`
 }
 
@@ -63,6 +64,7 @@ func CreatePost(router *gin.RouterGroup) {
 		newPost := entity.Post{
 			Title:   post.Title,
 			Content: post.Content,
+			Summary: post.Summary,
 		}
 
 		err := entity.CreatePost(&newPost)
@@ -169,7 +171,7 @@ func GetPost(router *gin.RouterGroup) {
 			return
 		}
 
-		post, err := entity.GetPost(id)
+		post, err := entity.GetPost(id, true /* getAllInformation */)
 
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
