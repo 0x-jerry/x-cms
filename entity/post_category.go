@@ -8,10 +8,10 @@ type PostCategory struct {
 	Category   Category `json:"category"`
 }
 
-func GetCategoriesByPostIds(postIds []uint) (*[]PostCategory, error) {
+func GetCategoriesByPostIds(postIds []uint) ([]PostCategory, error) {
 	var postCategories []PostCategory
 
 	err := Db().Where("post_id in ?", postIds).Find(&postCategories).Error
 
-	return &postCategories, err
+	return postCategories, err
 }

@@ -6,10 +6,10 @@ type Category struct {
 	Describe string `json:"describe"`
 }
 
-func GetCategoriesByIds(ids []uint) (*[]Category, error) {
+func GetCategoriesByIds(ids []uint) ([]Category, error) {
 	var categories []Category
 
 	err := Db().Where("id in ?", ids).Find(&categories).Error
 
-	return &categories, err
+	return categories, err
 }

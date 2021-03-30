@@ -10,10 +10,10 @@ type PostTag struct {
 	Tag   Tag  `json:"tag"`
 }
 
-func GetTagsByPostIds(postIds []uint) (*[]PostTag, error) {
+func GetTagsByPostIds(postIds []uint) ([]PostTag, error) {
 	var postTags []PostTag
 
 	err := Db().Where("post_id in ?", postIds).Find(&postTags).Error
 
-	return &postTags, err
+	return postTags, err
 }

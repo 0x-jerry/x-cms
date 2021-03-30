@@ -171,7 +171,7 @@ func GetPost(router *gin.RouterGroup) {
 			return
 		}
 
-		post, err := entity.GetPost(id, true /* getAllInformation */)
+		article, err := entity.GetPost(id, true /* getAllInformation */)
 
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -181,7 +181,7 @@ func GetPost(router *gin.RouterGroup) {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"post": post,
+			"post": article,
 		})
 	})
 }
