@@ -38,7 +38,7 @@ func GetPost(id uint, allInformation bool) (*Article, error) {
 		err = Db().Omit("content").Find(&post).Error
 	}
 
-	articles, err := GetArticles([]Post{post})
+	articles, err := getArticles([]Post{post})
 
 	if err != nil {
 		return nil, err
@@ -70,13 +70,14 @@ func GetPosts(page int, size int, sort string) ([]Article, error) {
 		return articles, err
 	}
 
-	articles, err = GetArticles(posts)
+	articles, err = getArticles(posts)
 
 	return articles, err
 }
 
-func GetArticles(posts []Post) ([]Article, error) {
-	var articles []Article
+// 获取 tags 以及 categories，然后组装成 articles
+func getArticles(posts []Post) ([]Article, error) {
+	articles := []Article{}
 
 	var (
 		postIds         []uint
