@@ -15,7 +15,7 @@ func Initialize(dbName string) {
 		panic("failed to connect database")
 	}
 
-	db.AutoMigrate(&User{}, &Category{}, &Note{}, &Post{}, &Tag{}, &PostTag{}, &PostCategory{})
+	db.AutoMigrate(User{}, Category{}, Note{}, Post{}, Tag{}, PostTag{}, PostCategory{})
 	dbInstance = db
 }
 

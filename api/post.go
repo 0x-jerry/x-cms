@@ -38,8 +38,17 @@ func GetPosts(router *gin.RouterGroup) {
 			return
 		}
 
+		articles, err := entity.GetArticles(posts)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"errMsg": err.Error(),
+			})
+			return
+		}
+
 		c.JSON(http.StatusOK, gin.H{
-			"posts": posts,
+			"posts": articles,
 		})
 	})
 }
@@ -171,7 +180,16 @@ func GetPost(router *gin.RouterGroup) {
 			return
 		}
 
-		article, err := entity.GetPost(id, true /* getAllInformation */)
+		post, err := entity.GetPost(id, true /* getAllInformation */)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"errMsg": err.Error(),
+			})
+			return
+		}
+
+		article, err := entity.GetArticles([]entity.Post{*post})
 
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
