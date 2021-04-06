@@ -14,8 +14,8 @@ type Pagenation struct {
 }
 
 // 获取文章列表
-func GetPosts(router *gin.RouterGroup) {
-	router.GET("/posts", func(c *gin.Context) {
+func GetArticles(router *gin.RouterGroup) {
+	router.GET("/articles", func(c *gin.Context) {
 		pagenation := Pagenation{
 			Page:   0,
 			Size:   10,
@@ -48,21 +48,21 @@ func GetPosts(router *gin.RouterGroup) {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"posts": articles,
+			"articles": articles,
 		})
 	})
 }
 
-type createPostParam struct {
+type createArticleParam struct {
 	Title   string `form:"title" binding:"required"`
 	Summary string `form:"summary"`
 	Content string `form:"content" binding:"required"`
 }
 
 // 创建新的文章
-func CreatePost(router *gin.RouterGroup) {
-	router.POST("/post", func(c *gin.Context) {
-		var post createPostParam
+func CreateArticle(router *gin.RouterGroup) {
+	router.POST("/article", func(c *gin.Context) {
+		var post createArticleParam
 		if err := c.Bind(&post); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"errMsg": err.Error(),
@@ -86,20 +86,20 @@ func CreatePost(router *gin.RouterGroup) {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"post": newPost,
+			"article": newPost,
 		})
 	})
 }
 
-type updatePostParam struct {
+type updateArticleParam struct {
 	Title   string `form:"title"`
 	Content string `form:"content"`
 }
 
 // 更新文章内容
-func UpdatePost(router *gin.RouterGroup) {
-	router.PUT("/post/:id", func(c *gin.Context) {
-		var params updatePostParam
+func UpdateArticle(router *gin.RouterGroup) {
+	router.PUT("/article/:id", func(c *gin.Context) {
+		var params updateArticleParam
 
 		if err := c.Bind(&params); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -141,8 +141,8 @@ func UpdatePost(router *gin.RouterGroup) {
 }
 
 // 删除文章
-func DeletePost(router *gin.RouterGroup) {
-	router.DELETE("/post/:id", func(c *gin.Context) {
+func DeleteArticle(router *gin.RouterGroup) {
+	router.DELETE("/article/:id", func(c *gin.Context) {
 		postId := c.Param("id")
 
 		id, err := ConvertToID(postId)
@@ -167,8 +167,8 @@ func DeletePost(router *gin.RouterGroup) {
 }
 
 // 获取文章详情
-func GetPost(router *gin.RouterGroup) {
-	router.GET("post/:id", func(c *gin.Context) {
+func GetArticle(router *gin.RouterGroup) {
+	router.GET("article/:id", func(c *gin.Context) {
 		postId := c.Param("id")
 
 		id, err := ConvertToID(postId)
@@ -189,7 +189,7 @@ func GetPost(router *gin.RouterGroup) {
 			return
 		}
 
-		article, err := entity.GetArticles([]entity.Post{*post})
+		articles, err := entity.GetArticles([]entity.Post{*post})
 
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -199,7 +199,7 @@ func GetPost(router *gin.RouterGroup) {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"post": article,
+			"article": articles[0],
 		})
 	})
 }
