@@ -16,4 +16,4 @@
 .env
 
 test.db
-temp
+/_temp

@@ -1,19 +1,25 @@
-package entity
+package service
 
-type Article struct {
-	Post
-	Tags       []Tag      `json:"tags"`
-	Categories []Category `json:"categories"`
+import "github.com/cwxyz007/x-cms/model"
+
+type ArticleService struct {
+	BasicService
+
+	TagService      TagService
+	CategoryService CategoryService
+
+	PostTagService      PostTagService
+	PostCategoryService PostCategoryService
 }
 
 // 获取 tags 以及 categories，然后组装成 articles
-func GetArticles(posts []Post) ([]Article, error) {
-	articles := []Article{}
+func (s *ArticleService) Get(posts []model.Post) ([]model.Article, error) {
+	articles := []model.Article{}
 
 	var (
-		postIds         []uint
-		postTagIds      []uint
-		postCategoryIds []uint
+		postIds         []string
+		postTagIds      []string
+		postCategoryIds []string
 	)
 
 	for _, v := range posts {
@@ -21,8 +27,8 @@ func GetArticles(posts []Post) ([]Article, error) {
 	}
 
 	// 获取 tag, category 和 post 的关系
-	postTags, err := GetTagsByPostIds(postIds)
-	postCategories, err := GetCategoriesByPostIds(postIds)
+	postTags, err := s.PostTagService.GetTagsByPostIds(postIds)
+	postCategories, err := s.PostCategoryService.GetCategoriesByPostIds(postIds)
 
 	if err != nil {
 		return articles, err
@@ -37,8 +43,8 @@ func GetArticles(posts []Post) ([]Article, error) {
 	}
 
 	// 获取有关联的所有 tag 和 category
-	tags, err := GetTagsByIds(postTagIds)
-	categories, err := GetCategoriesByIds(postCategoryIds)
+	tags, err := s.TagService.GetTagsByIds(postTagIds)
+	categories, err := s.CategoryService.GetCategoriesByIds(postCategoryIds)
 
 	if err != nil {
 		return articles, err
@@ -49,7 +55,7 @@ func GetArticles(posts []Post) ([]Article, error) {
 		pTags := findTagsByPostId(postTags, tags, v)
 		pCategories := findCategoriesByPostId(postCategories, categories, v)
 
-		articles = append(articles, Article{
+		articles = append(articles, model.Article{
 			Post:       v,
 			Tags:       pTags,
 			Categories: pCategories,
@@ -60,8 +66,8 @@ func GetArticles(posts []Post) ([]Article, error) {
 }
 
 // 根据 post 和 category 的关系，找到这个 post 所有的 categories
-func findCategoriesByPostId(postTags []PostCategory, categories []Category, post Post) []Category {
-	pCategories := []Category{}
+func findCategoriesByPostId(postTags []model.PostCategory, categories []model.Category, post model.Post) []model.Category {
+	pCategories := []model.Category{}
 
 	for _, v := range postTags {
 		if v.PostID == post.ID {
@@ -72,8 +78,8 @@ func findCategoriesByPostId(postTags []PostCategory, categories []Category, post
 	return pCategories
 }
 
-func findCategoryById(categories []Category, id uint) Category {
-	var category Category
+func findCategoryById(categories []model.Category, id string) model.Category {
+	var category model.Category
 
 	for _, v := range categories {
 		if v.ID == id {
@@ -86,8 +92,8 @@ func findCategoryById(categories []Category, id uint) Category {
 }
 
 // 根据 post 和 tag 的关系，找到这个 post 所有的 tags
-func findTagsByPostId(postTags []PostTag, tags []Tag, post Post) []Tag {
-	pTags := []Tag{}
+func findTagsByPostId(postTags []model.PostTag, tags []model.Tag, post model.Post) []model.Tag {
+	pTags := []model.Tag{}
 
 	for _, v := range postTags {
 		if v.PostID == post.ID {
@@ -98,8 +104,8 @@ func findTagsByPostId(postTags []PostTag, tags []Tag, post Post) []Tag {
 	return pTags
 }
 
-func findTagById(tags []Tag, id uint) Tag {
-	var tag Tag
+func findTagById(tags []model.Tag, id string) model.Tag {
+	var tag model.Tag
 
 	for _, v := range tags {
 		if v.ID == id {

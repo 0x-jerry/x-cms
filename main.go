@@ -1,62 +1,91 @@
 package main
 
 import (
-	"time"
-
-	"github.com/cwxyz007/x-cms/api"
+	"github.com/cwxyz007/x-cms/controller"
 	"github.com/cwxyz007/x-cms/core"
-	"github.com/cwxyz007/x-cms/entity"
-	"github.com/gin-gonic/gin"
+	"github.com/cwxyz007/x-cms/database"
+	"github.com/cwxyz007/x-cms/service"
+	"github.com/kataras/iris/v12"
+	"github.com/kataras/iris/v12/mvc"
+	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
+
+type AppContext struct {
+	Logger   *logrus.Logger
+	Services *service.AllServices
+}
 
 func main() {
 	conf := core.GetConfig()
 
-	entity.Initialize("test.db")
+	db := database.New("test.db")
 
-	if !conf.Debug {
-		gin.SetMode(gin.ReleaseMode)
+	app := iris.Default()
+
+	services := setupService(db)
+
+	appContext := &AppContext{
+		Logger:   core.GetLogger(),
+		Services: services,
 	}
 
-	router := gin.New()
+	if conf.Debug {
+		app.Logger().SetLevel("debug")
+	}
 
-	router.Use(logger())
+	routeApi := app.Party("/api")
+	{
+		mvc.Configure(routeApi.Party("/articles"), setupArticleMVC(appContext))
+	}
 
-	api.RegisterRoutes(router)
-
-	router.Run(conf.Port)
+	app.Listen(conf.Port)
 }
 
-// logger instances a logger middleware for Gin.
-func logger() gin.HandlerFunc {
-	log := core.GetLogger()
-
-	return func(c *gin.Context) {
-		start := time.Now()
-		path := c.Request.URL.Path
-		raw := c.Request.URL.RawQuery
-
-		// Process request
-		c.Next()
-
-		// Stop timer
-		end := time.Now()
-		latency := end.Sub(start)
-
-		// clientIP := c.ClientIP()
-		method := c.Request.Method
-		statusCode := c.Writer.Status()
-
-		if raw != "" {
-			path = path + "?" + raw
-		}
-
-		// Use debug level to keep production logs clean.
-		log.Debugf("http: %s (%d) [%v] %s",
-			method,
-			statusCode,
-			latency,
-			path,
+func setupArticleMVC(ctx *AppContext) func(app *mvc.Application) {
+	return func(app *mvc.Application) {
+		app.Register(
+			ctx.Services,
+			ctx.Logger,
 		)
+
+		app.Handle(new(controller.ArticleController))
+	}
+}
+
+func setupService(db *gorm.DB) *service.AllServices {
+	tag := service.TagService{}
+	tag.SetDB(db)
+
+	category := service.CategoryService{}
+	category.SetDB(db)
+
+	post := service.PostService{}
+	post.SetDB(db)
+
+	postTag := service.PostTagService{}
+	postTag.SetDB(db)
+
+	postCategory := service.PostCategoryService{}
+	postCategory.SetDB(db)
+
+	article := service.ArticleService{
+		TagService:      tag,
+		CategoryService: category,
+
+		PostTagService:      postTag,
+		PostCategoryService: postCategory,
+	}
+	article.SetDB(db)
+
+	return &service.AllServices{
+		Tag:      tag,
+		Category: category,
+
+		Post:         post,
+		PostTag:      postTag,
+		PostCategory: postCategory,
+
+		Article: article,
 	}
 }
