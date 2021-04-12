@@ -8,7 +8,7 @@ type CategoryService struct {
 	BasicService
 }
 
-func (s *CategoryService) GetCategoriesByIds(ids []string) ([]model.Category, error) {
+func (s *CategoryService) GetBy(ids []string) ([]model.Category, error) {
 	var categories []model.Category
 
 	err := s.db.Where("id in ?", ids).Find(&categories).Error

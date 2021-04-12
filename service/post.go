@@ -6,15 +6,15 @@ type PostService struct {
 	BasicService
 }
 
-func (s *PostService) CreatePost(p *model.Post) error {
+func (s *PostService) Create(p *model.Post) error {
 	return s.db.Create(&p).Error
 }
 
-func (s *PostService) UpdatePost(p *model.Post) error {
+func (s *PostService) Update(p *model.Post) error {
 	return s.db.Model(&p).Updates(p).Error
 }
 
-func (s *PostService) GetPost(id string, allInformation bool) (*model.Post, error) {
+func (s *PostService) GetBy(id string, allInformation bool) (*model.Post, error) {
 	post := model.Post{
 		Model: model.Model{
 			ID: id,
@@ -32,7 +32,7 @@ func (s *PostService) GetPost(id string, allInformation bool) (*model.Post, erro
 	return &post, err
 }
 
-func (s *PostService) DeletePost(id string) error {
+func (s *PostService) DeleteBy(id string) error {
 	post := model.Post{
 		Model: model.Model{
 			ID: id,
@@ -42,7 +42,7 @@ func (s *PostService) DeletePost(id string) error {
 	return s.db.Delete(&post).Error
 }
 
-func (s *PostService) GetPosts(page int, size int, sort string) ([]model.Post, error) {
+func (s *PostService) GetBatch(page int, size int, sort string) ([]model.Post, error) {
 	offset := page * size
 
 	var posts []model.Post

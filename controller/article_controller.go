@@ -30,25 +30,25 @@ func (c *ArticleController) Get() Any {
 		return BadRequest(err)
 	}
 
-	posts, err := c.Services.Post.GetPosts(pagenation.Page, pagenation.Size, pagenation.SortBy)
+	posts, err := c.Services.Post.GetBatch(pagenation.Page, pagenation.Size, pagenation.SortBy)
 
 	if err != nil {
 		return BadRequest(err)
 	}
 
-	articles, err := c.Services.Article.Get(posts)
+	articles, err := c.Services.Article.GetByPosts(posts)
 
 	return ResponseWithError(articles, err)
 }
 
 func (c *ArticleController) GetBy(id string) Any {
-	post, err := c.Services.Post.GetPost(id, false)
+	post, err := c.Services.Post.GetBy(id, false)
 
 	if err != nil {
 		return BadRequest(err)
 	}
 
-	articles, err := c.Services.Article.Get([]model.Post{*post})
+	articles, err := c.Services.Article.GetByPosts([]model.Post{*post})
 
 	if err != nil {
 		return BadRequest(err)
@@ -76,7 +76,7 @@ func (c *ArticleController) Post() Any {
 		Summary: post.Summary,
 	}
 
-	err := c.Services.Post.CreatePost(&newPost)
+	err := c.Services.Post.Create(&newPost)
 
 	return ResponseWithError(newPost, err)
 }
@@ -102,7 +102,7 @@ func (c *ArticleController) PutBy(id string) Any {
 		Content: params.Content,
 	}
 
-	err := c.Services.Post.UpdatePost(&updatePost)
+	err := c.Services.Post.Update(&updatePost)
 
 	return ResponseWithError(SuccessResponse, err)
 }

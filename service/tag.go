@@ -6,7 +6,7 @@ type TagService struct {
 	BasicService
 }
 
-func (s *TagService) GetTagsByIds(ids []string) ([]model.Tag, error) {
+func (s *TagService) GetBy(ids []string) ([]model.Tag, error) {
 	var tags []model.Tag
 
 	err := s.db.Where("id in ?", ids).Find(&tags).Error

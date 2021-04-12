@@ -13,7 +13,7 @@ type ArticleService struct {
 }
 
 // 获取 tags 以及 categories，然后组装成 articles
-func (s *ArticleService) Get(posts []model.Post) ([]model.Article, error) {
+func (s *ArticleService) GetByPosts(posts []model.Post) ([]model.Article, error) {
 	articles := []model.Article{}
 
 	var (
@@ -27,9 +27,12 @@ func (s *ArticleService) Get(posts []model.Post) ([]model.Article, error) {
 	}
 
 	// 获取 tag, category 和 post 的关系
-	postTags, err := s.PostTagService.GetTagsByPostIds(postIds)
-	postCategories, err := s.PostCategoryService.GetCategoriesByPostIds(postIds)
+	postTags, err := s.PostTagService.GetByPostIds(postIds)
+	if err != nil {
+		return articles, err
+	}
 
+	postCategories, err := s.PostCategoryService.GetByPostIds(postIds)
 	if err != nil {
 		return articles, err
 	}
@@ -39,13 +42,16 @@ func (s *ArticleService) Get(posts []model.Post) ([]model.Article, error) {
 	}
 
 	for _, v := range postCategories {
-		postCategoryIds = append(postTagIds, v.CategoryID)
+		postCategoryIds = append(postCategoryIds, v.CategoryID)
 	}
 
 	// 获取有关联的所有 tag 和 category
-	tags, err := s.TagService.GetTagsByIds(postTagIds)
-	categories, err := s.CategoryService.GetCategoriesByIds(postCategoryIds)
+	tags, err := s.TagService.GetBy(postTagIds)
+	if err != nil {
+		return articles, err
+	}
 
+	categories, err := s.CategoryService.GetBy(postCategoryIds)
 	if err != nil {
 		return articles, err
 	}
