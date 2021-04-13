@@ -19,7 +19,7 @@ type Pagenation struct {
 	SortBy string `form:"sortBy" binding:"oneof=created_at updated_at"`
 }
 
-func (c *ArticleController) Get() Any {
+func (c *ArticleController) Get() Response {
 	pagenation := Pagenation{
 		Page:   0,
 		Size:   10,
@@ -41,7 +41,7 @@ func (c *ArticleController) Get() Any {
 	return ResponseWithError(articles, err)
 }
 
-func (c *ArticleController) GetBy(id string) Any {
+func (c *ArticleController) GetBy(id string) Response {
 	post, err := c.Services.Post.GetBy(id, false)
 
 	if err != nil {
@@ -63,7 +63,7 @@ type createArticleParam struct {
 	Content string `json:"content" binding:"required"`
 }
 
-func (c *ArticleController) Post() Any {
+func (c *ArticleController) Post() Response {
 	var post createArticleParam
 
 	if err := c.Ctx.ReadJSON(&post); err != nil {
@@ -86,7 +86,7 @@ type updateArticleParam struct {
 	Content string `json:"content"`
 }
 
-func (c *ArticleController) PutBy(id string) Any {
+func (c *ArticleController) PutBy(id string) Response {
 	var params updateArticleParam
 
 	if err := c.Ctx.ReadJSON(&params); err != nil {
