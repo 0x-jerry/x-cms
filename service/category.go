@@ -19,7 +19,7 @@ func (s *CategoryService) GetAll() ([]model.Category, error) {
 func (s *CategoryService) GetBy(id string) (model.Category, error) {
 	var category model.Category
 
-	err := s.db.Where("id == ?", id).Find(&category).Error
+	err := s.db.First(&category, "id == ?", id).Error
 
 	return category, err
 }

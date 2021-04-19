@@ -9,7 +9,7 @@ type TagService struct {
 func (s *TagService) GetBy(id string) (model.Tag, error) {
 	var tag model.Tag
 
-	err := s.db.Where("id == ?", id).Find(&tag).Error
+	err := s.db.First(&tag, "id == ?", id).Error
 
 	return tag, err
 }
