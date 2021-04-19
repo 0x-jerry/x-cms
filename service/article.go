@@ -51,7 +51,7 @@ func (s *ArticleService) GetByPosts(posts []model.Post) ([]model.Article, error)
 		return articles, err
 	}
 
-	categories, err := s.CategoryService.GetBy(postCategoryIds)
+	categories, err := s.CategoryService.GetBatchBy(postCategoryIds)
 	if err != nil {
 		return articles, err
 	}
