@@ -59,8 +59,11 @@ func (c *ArticleController) GetBy(id string) Response {
 
 type createArticleParam struct {
 	Title   string `json:"title" binding:"required"`
-	Summary string `json:"summary"`
 	Content string `json:"content" binding:"required"`
+	Summary string `json:"summary"`
+
+	TagIds      []string `json:"tagIds"`
+	CategoryIds []string `json:"categoryIds"`
 }
 
 func (c *ArticleController) Post() Response {
@@ -76,9 +79,41 @@ func (c *ArticleController) Post() Response {
 		Summary: post.Summary,
 	}
 
-	err := c.Services.Post.Create(&newPost)
+	if err := c.Services.Post.Create(&newPost); err != nil {
+		return BadRequest(err)
+	}
 
-	return ResponseWithError(newPost, err)
+	if len(post.TagIds) > 0 {
+		var postTags []model.PostTag
+
+		for _, tagId := range post.TagIds {
+			postTags = append(postTags, model.PostTag{
+				PostID: newPost.ID,
+				TagID:  tagId,
+			})
+		}
+
+		if err := c.Services.PostTag.CreateBatch(postTags); err != nil {
+			return BadRequest(err)
+		}
+	}
+
+	if len(post.CategoryIds) > 0 {
+		var postCategories []model.PostCategory
+
+		for _, categoryId := range post.CategoryIds {
+			postCategories = append(postCategories, model.PostCategory{
+				PostID:     newPost.ID,
+				CategoryID: categoryId,
+			})
+		}
+
+		if err := c.Services.PostCategory.CreateBatch(postCategories); err != nil {
+			return BadRequest(err)
+		}
+	}
+
+	return ResponseWithError(newPost, nil)
 }
 
 type updateArticleParam struct {
