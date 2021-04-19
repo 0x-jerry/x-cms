@@ -46,7 +46,7 @@ func (s *ArticleService) GetByPosts(posts []model.Post) ([]model.Article, error)
 	}
 
 	// 获取有关联的所有 tag 和 category
-	tags, err := s.TagService.GetBy(postTagIds)
+	tags, err := s.TagService.GetBatchBy(postTagIds)
 	if err != nil {
 		return articles, err
 	}

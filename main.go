@@ -37,9 +37,21 @@ func main() {
 	routeApi := app.Party("/api")
 	{
 		mvc.Configure(routeApi.Party("/articles"), setupArticleMVC(appContext))
+		mvc.Configure(routeApi.Party("/tags"), setupTagMVC(appContext))
 	}
 
 	app.Listen(conf.Port)
+}
+
+func setupTagMVC(ctx *AppContext) func(app *mvc.Application) {
+	return func(app *mvc.Application) {
+		app.Register(
+			ctx.Services,
+			ctx.Logger,
+		)
+
+		app.Handle(new(controller.TagController))
+	}
 }
 
 func setupArticleMVC(ctx *AppContext) func(app *mvc.Application) {
